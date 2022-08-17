@@ -23,16 +23,22 @@ iVerifyApps is a set of [Node.js](https://nodejs.org/en/) apps responsible for t
  
  There are 4 different apps, conveniently held in a single [Nrwl/Nx](https://nx.dev/getting-started/intro) monorepo:
  
-*  **api**: the backend for the Dashboard, build with [Nest.js](https://nestjs.com/)
-*  **iverify**: the frontend for the Dashboard, built with [Angular](https://angular.io/)
-*  **publisher**: a backend app built with [Nest.js](https://nestjs.com/) responsible for publishing data externally (primarily on WordPress)
-*  **triage**: a backend app built with [Nest.js](https://nestjs.com/) responsible for the triage of toxic social media content 
+*  **Api**: the backend for the Dashboard, build with [Nest.js](https://nestjs.com/)
+*  **Iverify**: the frontend for the Dashboard, built with [Angular](https://angular.io/)
+*  **Publisher**: a backend app built with [Nest.js](https://nestjs.com/) checks for new published articles in Meedan and moves the metadata and content to the portal (primarily on WordPress). It also sends a CSV with the daily published articles with all their annotation (Metadata)
+*  **Triage**: a backend app built with [Nest.js](https://nestjs.com/) responsible for the triage of toxic social media content 
+*  **Dashboard**: Made in node JS, integrates with WordPress for signing in. Reports statistics on information processing.
+*  **Fetcher**: Integrates with the Detoxify algorithm or Perspective API, reads the content from a Crowdtangle search every two hours, tags them with a toxicity indicator and if that value is higher than a threshold set (parameter) then it is sent to Meedan for factchecking.
 
+*  **SaaS dependencies**
+*  Check also the installation pre-requisites.
+* Meedan: the fact-checking platform.
+* Crowdtangle with a saved search
 Additionally, a **MySql database** is required for persistence.
 
 
 <a name="funcs"></a>
-## **Main functionalities** 
+## **Main functionalities**
 
 
 **Integration features:**
@@ -93,6 +99,16 @@ The Dashboard front-end offers data visualizations of several indicators giving 
 
 <a name="installation"></a>
 ## **Installation** 
+
+The solution comprises of 5 custom components (iVerify Dashboard, WordPress website, Dashboard API, Publisher bot, Triage bot) plus 3 external components integrated in the solution (Meedan Check, CrowdTangle, Perspective/Detoxify). Each custom component is deployed as an independent application within a dedicated Docker container. These are:
+* The WordPress website container
+*	The iVerify Dashboard container
+*	The Dashboard API container
+*	The Publisher bot container
+*	The Triage bot container
+<br></br>
+Additionally, the WordPress website and the Dashboard API also need a MySQL DB instance each. 
+All the containers need to be accessible through the internet as they communicate to each other through HTTP requests.
 
 <a name="prereq"></a>
 **Pre-requisites** 
@@ -187,13 +203,20 @@ The apps need a number of environment variables that can be stored in a single `
 
 
 <a name="inst_dev"></a>
-**Installation and development** 
+**Installation and deployment** 
 
 * To install dependencies: `npm i`
 * To run **api** locally: `npx nx serve api` 
 * To run **iverify** locally: `npx nx serve iverify`
 * To run **publisher** locally: `npx nx serve publisher`
 * To run **triage** locally: `npx nx serve triage`
+
+All the apps need to be built before deployment. The build command is:
+- `npx nx build APP_NAME –configuration=production`
+The **‘configuration’** flag represents additional configuration parameters that can be specified in the environments folder in each application. 
+After the build, the application bundle can be found in the **dist/APP_NAME** folder.
+This procedure can be automated using Docker and the repository includes a docker-compose.prod.yml file and app specific Dockerfile-prod files for each application. These can be customized to reflect the new deployment environment.
+
 
 <a name="api_ref"></a>
 ## **Api reference** 
